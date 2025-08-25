@@ -1,0 +1,20 @@
+[
+    {
+        "model": "users.customuser",
+        "pk": 1,
+        "fields": {
+            "password": "pbkdf2_sha256$720000$your_salt_here$your_hash_here",
+            "last_login": null,
+            "is_superuser": true,
+            "username": "admin",
+            "first_name": "Administrateur",
+            "last_name": "Système",
+            "email": "admin@example.com",
+            "is_staff": true,
+            "is_active": true,
+            "date_joined": "2024-01-01T00:00:00Z",
+            "groups": [],
+            "user_permissions": []
+        }
+    }
+]

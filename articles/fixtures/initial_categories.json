@@ -1,0 +1,162 @@
+[
+    {
+        "model": "articles.category",
+        "pk": 1,
+        "fields": {
+            "name": "Technologie",
+            "slug": "technologie"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 2,
+        "fields": {
+            "name": "Science",
+            "slug": "science"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 3,
+        "fields": {
+            "name": "Santé",
+            "slug": "sante"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 4,
+        "fields": {
+            "name": "Éducation",
+            "slug": "education"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 5,
+        "fields": {
+            "name": "Voyage",
+            "slug": "voyage"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 6,
+        "fields": {
+            "name": "Cuisine",
+            "slug": "cuisine"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 7,
+        "fields": {
+            "name": "Sport",
+            "slug": "sport"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 8,
+        "fields": {
+            "name": "Musique",
+            "slug": "musique"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 9,
+        "fields": {
+            "name": "Cinéma",
+            "slug": "cinema"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 10,
+        "fields": {
+            "name": "Littérature",
+            "slug": "litterature"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 11,
+        "fields": {
+            "name": "Art",
+            "slug": "art"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 12,
+        "fields": {
+            "name": "Mode",
+            "slug": "mode"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 13,
+        "fields": {
+            "name": "Automobile",
+            "slug": "automobile"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 14,
+        "fields": {
+            "name": "Finance",
+            "slug": "finance"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 15,
+        "fields": {
+            "name": "Politique",
+            "slug": "politique"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 16,
+        "fields": {
+            "name": "Environnement",
+            "slug": "environnement"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 17,
+        "fields": {
+            "name": "Histoire",
+            "slug": "histoire"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 18,
+        "fields": {
+            "name": "Philosophie",
+            "slug": "philosophie"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 19,
+        "fields": {
+            "name": "Psychologie",
+            "slug": "psychologie"
+        }
+    },
+    {
+        "model": "articles.category",
+        "pk": 20,
+        "fields": {
+            "name": "Économie",
+            "slug": "economie"
+        }
+    }
+]
