@@ -1,59 +1,23 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-import markdown
-from .models import Article, Category
-from .forms import ArticleForm
-
-def article_list(request):
-    articles = Article.objects.all().order_by('-created_at')
-    for article in articles:
-        article.content = markdown.markdown(article.content)  # Convertir Markdown en HTML
-    return render(request, 'articles/article_list.html', {'articles': articles})
-
-def article_detail(request, slug):
-    article = get_object_or_404(Article, slug=slug)
-    article.content = markdown.markdown(article.content)  # Convertir Markdown
-    return render(request, 'articles/article_detail.html', {'article': article})
-
-@login_required
-def article_create(request):
-    if request.method == 'POST':
-        form = ArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            article = form.save(commit=False)
-            article.author = request.user
-            article.save()
-            messages.success(request, 'Article créé avec succès !')
-            return redirect('article_detail', slug=article.slug)
-    else:
-        form = ArticleForm()
-    return render(request, 'articles/article_form.html', {'form': form, 'action': 'Créer'})
-
-@login_required
-def article_edit(request, slug):
-    article = get_object_or_404(Article, slug=slug)
-    if request.user != article.author and not request.user.is_staff:
-        messages.error(request, "Vous n'êtes pas autorisé à modifier cet article.")
-        return redirect('article_detail', slug=slug)
-    if request.method == 'POST':
-        form = ArticleForm(request.POST, request.FILES, instance=article)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Article mis à jour avec succès !')
-            return redirect('article_detail', slug=article.slug)
-    else:
-        form = ArticleForm(instance=article)
-    return render(request, 'articles/article_form.html', {'form': form, 'action': 'Modifier'})
-
-@login_required
-def article_delete(request, slug):
-    article = get_object_or_404(Article, slug=slug)
-    if request.user != article.author and not request.user.is_staff:
-        messages.error(request, "Vous n'êtes pas autorisé à supprimer cet article.")
-        return redirect('article_detail', slug=slug)
-    if request.method == 'POST':
-        article.delete()
-        messages.success(request, 'Article supprimé avec succès !')
-        return redirect('article_list')
-    return render(request, 'articles/article_confirm_delete.html', {'article': article})
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-4">
+    <h1>Blog Tech & Jeux Vidéo</h1>
+    {% if user.is_authenticated %}
+        <a href="{% url 'article_create' %}" class="btn btn-primary mb-3">Créer un article</a>
+    {% endif %}
+    {% for article in articles %}
+        <div class="card mb-3">
+            {% if article.image %}
+                <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.title }}" style="max-height: 200px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body">
+                <h2 class="card-title"><a href="{% url 'article_detail' article.slug %}">{{ article.title }}</a></h2>
+                <p class="card-text">Par {{ article.author }} | {{ article.created_at|date:"d M Y" }} | {{ article.category }}</p>
+                <div class="card-text">{{ article.content|safe }}</div>
+            </div>
+        </div>
+    {% empty %}
+        <p>Aucun article pour le moment.</p>
+    {% endfor %}
+</div>
+{% endblock %}

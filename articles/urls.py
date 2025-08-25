@@ -3,8 +3,8 @@ from .views import article_list, article_detail, article_create, article_edit, a
 
 urlpatterns = [
     path('', article_list, name='article_list'),
-    path('<slug:slug>/', article_detail, name='article_detail'),
     path('create/', article_create, name='article_create'),
+    path('<slug:slug>/', article_detail, name='article_detail'),
     path('<slug:slug>/edit/', article_edit, name='article_edit'),
     path('<slug:slug>/delete/', article_delete, name='article_delete'),
 ]

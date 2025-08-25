@@ -7,4 +7,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('users.urls')),
     path('articles/', include('articles.urls')),
+    path('', include('articles.urls')),  # Ajoute l'URL racine
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
