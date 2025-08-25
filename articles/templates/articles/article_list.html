@@ -2,10 +2,30 @@
 {% block content %}
 <div class="container my-4">
     <h1>Blog Tech & Jeux Vidéo</h1>
+    
+    <!-- Barre de recherche -->
+    <form method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Rechercher un article..." value="{{ query }}">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        </div>
+    </form>
+    
+    <!-- Filtrage par catégories -->
+    <div class="mb-4">
+        <a href="{% url 'article_list' %}" class="btn btn-outline-primary {% if not selected_category %}active{% endif %}">Toutes</a>
+        {% for category in categories %}
+            <a href="{% url 'article_list' %}?category={{ category.slug }}" class="btn btn-outline-primary {% if selected_category == category.slug %}active{% endif %}">{{ category.name }}</a>
+        {% endfor %}
+    </div>
+    
+    <!-- Bouton pour créer un article -->
     {% if user.is_authenticated %}
         <a href="{% url 'article_create' %}" class="btn btn-primary mb-3">Créer un article</a>
     {% endif %}
-    {% for article in articles %}
+    
+    <!-- Liste des articles -->
+    {% for article in page_obj %}
         <div class="card mb-3">
             {% if article.image %}
                 <img src="{{ article.image.url }}" class="card-img-top" alt="{{ article.title }}" style="max-height: 200px; object-fit: cover;">
@@ -17,7 +37,30 @@
             </div>
         </div>
     {% empty %}
-        <p>Aucun article pour le moment.</p>
+        <p>Aucun article trouvé.</p>
     {% endfor %}
+    
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">Précédent</a>
+                    </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}">Suivant</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
 </div>
 {% endblock %}

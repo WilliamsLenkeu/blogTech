@@ -1,15 +1,46 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.paginator import Paginator
 import markdown
 from .models import Article, Category, Comment
 from .forms import ArticleForm, CommentForm
+from django.db.models import Q
 
 def article_list(request):
+    # Récupérer les paramètres GET pour la recherche et le filtrage
+    query = request.GET.get('q', '')
+    category_slug = request.GET.get('category', '')
+    
+    # Récupérer tous les articles
     articles = Article.objects.all().order_by('-created_at')
+    
+    # Filtrer par catégorie si spécifiée
+    if category_slug:
+        articles = articles.filter(category__slug=category_slug)
+    
+    # Rechercher dans le titre ou le contenu si un terme de recherche est fourni
+    if query:
+        articles = articles.filter(Q(title__icontains=query) | Q(content__icontains=query))
+    
+    # Convertir le contenu Markdown en HTML
     for article in articles:
-        article.content = markdown.markdown(article.content)  # Convertir Markdown en HTML
-    return render(request, 'articles/article_list.html', {'articles': articles})
+        article.content = markdown.markdown(article.content)
+    
+    # Pagination : 10 articles par page
+    paginator = Paginator(articles, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Récupérer toutes les catégories pour le menu de filtrage
+    categories = Category.objects.all()
+    
+    return render(request, 'articles/article_list.html', {
+        'page_obj': page_obj,
+        'categories': categories,
+        'query': query,
+        'selected_category': category_slug,
+    })
 
 def article_detail(request, slug):
     article = get_object_or_404(Article, slug=slug)
