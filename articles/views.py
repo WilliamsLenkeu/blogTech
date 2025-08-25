@@ -2,37 +2,28 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-import markdown
-from .models import Article, Category, Comment
-from .forms import ArticleForm, CommentForm
 from django.db.models import Q
+import markdown
+from .models import Article, Category, Comment, Like
+from .forms import ArticleForm, CommentForm
 
 def article_list(request):
-    # Récupérer les paramètres GET pour la recherche et le filtrage
     query = request.GET.get('q', '')
     category_slug = request.GET.get('category', '')
+    articles = Article.objects.all().select_related('category', 'author').order_by('-created_at')
     
-    # Récupérer tous les articles
-    articles = Article.objects.all().order_by('-created_at')
-    
-    # Filtrer par catégorie si spécifiée
     if category_slug:
         articles = articles.filter(category__slug=category_slug)
-    
-    # Rechercher dans le titre ou le contenu si un terme de recherche est fourni
     if query:
         articles = articles.filter(Q(title__icontains=query) | Q(content__icontains=query))
     
-    # Convertir le contenu Markdown en HTML
     for article in articles:
         article.content = markdown.markdown(article.content)
     
-    # Pagination : 10 articles par page
     paginator = Paginator(articles, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    # Récupérer toutes les catégories pour le menu de filtrage
     categories = Category.objects.all()
     
     return render(request, 'articles/article_list.html', {
@@ -44,8 +35,10 @@ def article_list(request):
 
 def article_detail(request, slug):
     article = get_object_or_404(Article, slug=slug)
-    article.content = markdown.markdown(article.content)  # Convertir Markdown
-    comments = article.comments.all().order_by('-created_at')  # Récupérer les commentaires
+    article.content = markdown.markdown(article.content)
+    comments = article.comments.all().order_by('-created_at')
+    is_liked = article.likes.filter(user=request.user).exists() if request.user.is_authenticated else False
+    
     if request.method == 'POST':
         if not request.user.is_authenticated:
             messages.error(request, "Vous devez être connecté pour commenter.")
@@ -60,10 +53,12 @@ def article_detail(request, slug):
             return redirect('article_detail', slug=article.slug)
     else:
         form = CommentForm()
+    
     return render(request, 'articles/article_detail.html', {
         'article': article,
         'comments': comments,
-        'form': form
+        'form': form,
+        'is_liked': is_liked,
     })
 
 @login_required
@@ -120,3 +115,14 @@ def comment_delete(request, slug, comment_id):
         messages.success(request, 'Commentaire supprimé avec succès !')
         return redirect('article_detail', slug=slug)
     return render(request, 'articles/comment_confirm_delete.html', {'article': article, 'comment': comment})
+
+@login_required
+def article_like(request, slug):
+    article = get_object_or_404(Article, slug=slug)
+    like, created = Like.objects.get_or_create(article=article, user=request.user)
+    if not created:
+        like.delete()
+        messages.success(request, 'Like retiré.')
+    else:
+        messages.success(request, 'Article liké !')
+    return redirect('article_detail', slug=article.slug)

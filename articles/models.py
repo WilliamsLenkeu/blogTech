@@ -47,3 +47,14 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Commentaire par {self.author} sur {self.article}"
+
+class Like(models.Model):
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='likes')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('article', 'user')  # Un utilisateur ne peut liker un article qu'une fois
+
+    def __str__(self):
+        return f"Like de {self.user} sur {self.article}"

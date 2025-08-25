@@ -2,11 +2,24 @@
 {% block content %}
 <div class="container my-4">
     <h1>{{ article.title }}</h1>
-    <p>Par {{ article.author }} | {{ article.created_at|date:"d M Y" }} | {{ article.category }}</p>
+    <p>Par {{ article.author }} | {{ article.created_at|date:"d M Y" }} | {{ article.category }} | {{ article.likes.count }} Like{{ article.likes.count|pluralize }}</p>
     {% if article.image %}
         <img src="{{ article.image.url }}" class="img-fluid mb-3" alt="{{ article.title }}" style="max-height: 400px; object-fit: cover;">
     {% endif %}
     <div>{{ article.content|safe }}</div>
+    
+    <!-- Bouton Like -->
+    {% if user.is_authenticated %}
+        <form method="post" action="{% url 'article_like' article.slug %}">
+            {% csrf_token %}
+            <button type="submit" class="btn {% if is_liked %}btn-outline-primary{% else %}btn-primary{% endif %}">
+                {% if is_liked %}Retirer le like{% else %}Liker{% endif %}
+            </button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Connectez-vous</a> pour liker cet article.</p>
+    {% endif %}
+    
     {% if user.is_authenticated and user == article.author or user.is_staff %}
         <a href="{% url 'article_edit' article.slug %}" class="btn btn-warning">Modifier</a>
         <a href="{% url 'article_delete' article.slug %}" class="btn btn-danger">Supprimer</a>
