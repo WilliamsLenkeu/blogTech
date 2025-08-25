@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import markdown
-from .models import Article, Category
-from .forms import ArticleForm
+from .models import Article, Category, Comment
+from .forms import ArticleForm, CommentForm
 
 def article_list(request):
     articles = Article.objects.all().order_by('-created_at')
@@ -14,7 +14,26 @@ def article_list(request):
 def article_detail(request, slug):
     article = get_object_or_404(Article, slug=slug)
     article.content = markdown.markdown(article.content)  # Convertir Markdown
-    return render(request, 'articles/article_detail.html', {'article': article})
+    comments = article.comments.all().order_by('-created_at')  # Récupérer les commentaires
+    if request.method == 'POST':
+        if not request.user.is_authenticated:
+            messages.error(request, "Vous devez être connecté pour commenter.")
+            return redirect('login')
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.article = article
+            comment.author = request.user
+            comment.save()
+            messages.success(request, 'Commentaire ajouté avec succès !')
+            return redirect('article_detail', slug=article.slug)
+    else:
+        form = CommentForm()
+    return render(request, 'articles/article_detail.html', {
+        'article': article,
+        'comments': comments,
+        'form': form
+    })
 
 @login_required
 def article_create(request):
@@ -57,3 +76,16 @@ def article_delete(request, slug):
         messages.success(request, 'Article supprimé avec succès !')
         return redirect('article_list')
     return render(request, 'articles/article_confirm_delete.html', {'article': article})
+
+@login_required
+def comment_delete(request, slug, comment_id):
+    article = get_object_or_404(Article, slug=slug)
+    comment = get_object_or_404(Comment, id=comment_id)
+    if request.user != comment.author and request.user != article.author and not request.user.is_staff:
+        messages.error(request, "Vous n'êtes pas autorisé à supprimer ce commentaire.")
+        return redirect('article_detail', slug=slug)
+    if request.method == 'POST':
+        comment.delete()
+        messages.success(request, 'Commentaire supprimé avec succès !')
+        return redirect('article_detail', slug=slug)
+    return render(request, 'articles/comment_confirm_delete.html', {'article': article, 'comment': comment})

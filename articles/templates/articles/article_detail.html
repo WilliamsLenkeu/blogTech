@@ -11,5 +11,31 @@
         <a href="{% url 'article_edit' article.slug %}" class="btn btn-warning">Modifier</a>
         <a href="{% url 'article_delete' article.slug %}" class="btn btn-danger">Supprimer</a>
     {% endif %}
+
+    <h2 class="mt-5">Commentaires</h2>
+    {% for comment in comments %}
+        <div class="card mb-2">
+            <div class="card-body">
+                <p class="card-text">{{ comment.content }}</p>
+                <p class="card-text"><small>Par {{ comment.author }} | {{ comment.created_at|date:"d M Y H:i" }}</small></p>
+                {% if user.is_authenticated and user == comment.author or user == article.author or user.is_staff %}
+                    <a href="{% url 'comment_delete' article.slug comment.id %}" class="btn btn-danger btn-sm">Supprimer</a>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p>Aucun commentaire pour le moment.</p>
+    {% endfor %}
+
+    {% if user.is_authenticated %}
+        <h3>Ajouter un commentaire</h3>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Commenter</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">Connectez-vous</a> pour ajouter un commentaire.</p>
+    {% endif %}
 </div>
 {% endblock %}
