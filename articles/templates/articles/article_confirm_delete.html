@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container my-4">
+    <h1>Supprimer l'article</h1>
+    <p>Êtes-vous sûr de vouloir supprimer "{{ article.title }}" ?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Confirmer</button>
+        <a href="{% url 'article_detail' article.slug %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}
