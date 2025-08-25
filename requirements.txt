@@ -1,0 +1,7 @@
+# Dépendances pour le projet Django Blog
+Django>=5.2.5
+Faker>=20.0.0
+
+# Pour le développement
+# python-decouple>=3.8
+# Pillow>=10.0.0  # Pour les images
